@@ -2400,7 +2400,7 @@ function get_risks_by_table($status, $sort, $group, $affected_assets_filter, $ta
                     $custom_fields_length = 0;
                 }
                 
-                $length = 41 + $custom_fields_length;
+                $length = 42 + $custom_fields_length;
                 
                 echo "<th bgcolor=\"#0088CC\" colspan=\"{$length}\"><center>". $escaper->escapeHtml($current_group) ."</center></th>\n";
                 echo "</tr>\n";
@@ -2435,7 +2435,7 @@ function get_risks_by_table($status, $sort, $group, $affected_assets_filter, $ta
 /********************************
  * FUNCTION: GET HEADER COLUMNS *
  ********************************/
-function get_header_columns($hide, $id, $risk_status, $subject, $reference_id, $regulation, $control_number, $location, $source, $category, $team, $additional_stakeholders, $technology, $owner, $manager, $submitted_by, $scoring_method, $calculated_risk, $residual_risk, $submission_date, $review_date, $project, $mitigation_planned, $management_review, $days_open, $next_review_date, $next_step, $affected_assets, $planning_strategy, $planning_date, $mitigation_effort, $mitigation_cost, $mitigation_owner, $mitigation_team, $mitigation_accepted, $mitigation_date, $mitigation_controls, $risk_assessment, $additional_notes, $current_solution, $security_recommendations, $security_requirements, $risk_tags, $custom_columns=[])
+function get_header_columns($hide, $id, $risk_status, $subject, $reference_id, $regulation, $control_number, $location, $source, $category, $team, $additional_stakeholders, $technology, $owner, $manager, $submitted_by, $scoring_method, $calculated_risk, $residual_risk, $submission_date, $review_date, $project, $mitigation_planned, $management_review, $days_open, $next_review_date, $next_step, $affected_assets, $planning_strategy, $planning_date, $mitigation_effort, $mitigation_cost, $mitigation_owner, $mitigation_team, $mitigation_accepted, $mitigation_date, $mitigation_controls, $risk_assessment, $additional_notes, $current_solution, $security_recommendations, $security_requirements, $risk_tags, $custom_columns=[], $date_closed=false)
 {
     global $lang;
     global $escaper;
@@ -2488,6 +2488,8 @@ function get_header_columns($hide, $id, $risk_status, $subject, $reference_id, $
     echo "<th class=\"mitigation_date\" data-name='mitigation_date' " . ($mitigation_date == true ? "" : "style=\"{$display}\" ") . "align=\"left\" width=\"50px\">". $escaper->escapeHtml($lang['MitigationDate']) ."</th>\n";
     echo "<th class=\"mitigation_controls\" data-name='mitigation_controls' " . ($mitigation_controls == true ? "" : "style=\"{$display}\" ") . "align=\"left\" width=\"300px\">". $escaper->escapeHtml($lang['MitigationControls']) ."</th>\n";
     echo "<th class=\"risk_tags\" data-name='risk_tags' " . ($risk_tags == true ? "" : "style=\"{$display}\" ") . "align=\"left\" width=\"50px\">". $escaper->escapeHtml($lang['Tags']) ."</th>\n";
+    echo "<th class=\"date_closed\" data-name='date_closed' " . ($date_closed == true ? "" : "style=\"{$display}\" ") . "align=\"left\" width=\"150px\">". $escaper->escapeHtml($lang['DateClosed']) ."</th>\n";
+    
 
     // If customization extra is enabled, add custom fields
     if(customization_extra())
@@ -2888,20 +2890,23 @@ function make_full_risks_sql($status, $sort, $group, $affected_assets_filter, $t
     {
         // Open risks
         case 0:
-                $status_query = " AND a.status != \"Closed\" ";
-                break;
+            $status_query = " AND a.status != \"Closed\" ";
+            break;
+
         // Closed risks
         case 1:
-                $status_query = " AND a.status = \"Closed\" ";
-                break;
-        case 2:
+            $status_query = " AND a.status = \"Closed\" ";
+            break;
+
         // All risks
-                $status_query = " AND 1 ";
-                break;
+        case 2:
+            $status_query = " AND 1 ";
+            break;
+
         // Default to open risks
         default:
-                $status_query = " AND a.status != \"Closed\" ";
-                break;
+            $status_query = " AND a.status != \"Closed\" ";
+            break;
     }
 
     // If this is risks_by_teams page
@@ -3134,6 +3139,9 @@ function make_full_risks_sql($status, $sort, $group, $affected_assets_filter, $t
             case "planning_date":
                 $sort_name = " planning_date {$orderDir} ";
                 break;
+            case "date_closed":
+                $sort_name = " last_update {$orderDir} ";
+                break;
         }
     }
     
@@ -3151,10 +3159,11 @@ function make_full_risks_sql($status, $sort, $group, $affected_assets_filter, $t
                 case "risk_level":
                     $group_value_from_db = get_risk_level_name($group_value_from_db);
                     $group_field_name = " t1.risk_level_name";
-                break;
+                    break;
+
                 default:
                     $group_field_name = " t1.{$group_name} ";
-                break;
+                    break;
             }
             $whereQuery .= " and ({$group_field_name} = :group_value or :group_value = '' and {$group_field_name} is null) ";
         }
@@ -3313,6 +3322,7 @@ function risks_query($status, $sort, $group, $affected_assets_filter, $tags_filt
         $mgmt_review = $risk['mgmt_review'];
         $days_open = dayssince($risk['submission_date']);
         $risk_tags = $risk['risk_tags'];
+        $date_closed = $status == 'Closed' ? $risk['last_update'] : '';
 
         // If next_review_date_uses setting is Residual Risk.
         if(get_setting('next_review_date_uses') == "ResidualRisk")
@@ -3381,7 +3391,7 @@ function risks_query($status, $sort, $group, $affected_assets_filter, $tags_filt
         else $group_value = $group_name;
 
         // Create the new data array
-        $data[] = array("id" => $risk_id, "status" => $status, "subject" => $subject, "reference_id" => $reference_id, "control_number" => $control_number, "submission_date" => $submission_date, "last_update" => $last_update, "review_date" => $review_date, "scoring_method" => $scoring_method, "calculated_risk" => $calculated_risk, "residual_risk" => $residual_risk, "color" => $color, "residual_color" => $residual_color, "risk_level" => $risk_level, "residual_risk_level" => $residual_risk_level, "location" => $location, "source" => $source, "category" => $category, "team" => $team, "additional_stakeholders" => $additional_stakeholders, "technology" => $technology, "owner" => $owner, "manager" => $manager, "submitted_by" => $submitted_by, "regulation" => $regulation, "project" => $project, "mgmt_review" => $mgmt_review, "days_open" => $days_open, "next_review_date" => $next_review_date, "next_review_date_html" => $next_review_date_html, "next_step" => $next_step, "affected_assets" => $affected_assets, "risk_assessment" => $risk_assessment, "additional_notes" => $additional_notes, "current_solution" => $current_solution, "security_recommendations" => $security_recommendations, "security_requirements" => $security_requirements, "month_submitted" => $month_submitted, "planning_strategy" => $planning_strategy, "mitigation_id" => $mitigation_id, "planning_date" => $planning_date, "mitigation_effort" => $mitigation_effort, "mitigation_min_cost" => $mitigation_min_cost, "mitigation_max_cost" => $mitigation_max_cost, "mitigation_cost" => $mitigation_cost, "mitigation_owner" => $mitigation_owner, "mitigation_team" => $mitigation_team, "mitigation_accepted" => $mitigation_accepted, "mitigation_date" => $mitigation_date, "mitigation_control_names" => $mitigation_control_names, "group_name" => $group_name, "group_value" => $group_value, 'closure_date' => $closure_date, 'risk_tags' => $risk_tags);
+        $data[] = array("id" => $risk_id, "status" => $status, "subject" => $subject, "reference_id" => $reference_id, "control_number" => $control_number, "submission_date" => $submission_date, "last_update" => $last_update, "review_date" => $review_date, "scoring_method" => $scoring_method, "calculated_risk" => $calculated_risk, "residual_risk" => $residual_risk, "color" => $color, "residual_color" => $residual_color, "risk_level" => $risk_level, "residual_risk_level" => $residual_risk_level, "location" => $location, "source" => $source, "category" => $category, "team" => $team, "additional_stakeholders" => $additional_stakeholders, "technology" => $technology, "owner" => $owner, "manager" => $manager, "submitted_by" => $submitted_by, "regulation" => $regulation, "project" => $project, "mgmt_review" => $mgmt_review, "days_open" => $days_open, "next_review_date" => $next_review_date, "next_review_date_html" => $next_review_date_html, "next_step" => $next_step, "affected_assets" => $affected_assets, "risk_assessment" => $risk_assessment, "additional_notes" => $additional_notes, "current_solution" => $current_solution, "security_recommendations" => $security_recommendations, "security_requirements" => $security_requirements, "month_submitted" => $month_submitted, "planning_strategy" => $planning_strategy, "mitigation_id" => $mitigation_id, "planning_date" => $planning_date, "mitigation_effort" => $mitigation_effort, "mitigation_min_cost" => $mitigation_min_cost, "mitigation_max_cost" => $mitigation_max_cost, "mitigation_cost" => $mitigation_cost, "mitigation_owner" => $mitigation_owner, "mitigation_team" => $mitigation_team, "mitigation_accepted" => $mitigation_accepted, "mitigation_date" => $mitigation_date, "mitigation_control_names" => $mitigation_control_names, "group_name" => $group_name, "group_value" => $group_value, 'closure_date' => $closure_date, 'risk_tags' => $risk_tags, 'date_closed' => $date_closed);
     }
 
     // Return the data array

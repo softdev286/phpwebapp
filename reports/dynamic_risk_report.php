@@ -173,7 +173,7 @@ $columns = array(
     'current_solution',
     'security_recommendations',
     'security_requirements',
-    'risk_tags',
+    'risk_tags'
 );
 
 $custom_values = [];

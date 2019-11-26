@@ -908,6 +908,7 @@ function dynamicriskForm()
                 $escaper->escapeHtml($row['mitigation_date']),
                 $escaper->escapeHtml($row['mitigation_control_names']),
                 $escaper->escapeHtml($row['risk_tags']),
+                $escaper->escapeHtml($row['date_closed'])
             );
 
             // If customization extra is enabled, add custom fields
