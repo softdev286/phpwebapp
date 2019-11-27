@@ -41,15 +41,15 @@ $(document).ready(function(){
                 },
                 onDropdownHide: function(){
                     $('.dataTables_scrollFoot', selfTable.table().container()).css('height', 'auto')
-                    selfTable.columns.adjust()
+                    selfTable.columns.adjust();
                 },
                 onChange: function(){
-                    selfTable.columns.adjust()
+                    selfTable.columns.adjust();
+                    selfTable.draw();
                 }
                 
             })
-            selfTable.columns.adjust()
-            
+            selfTable.columns.adjust();
         }
 
         var riskDataTables = [];
