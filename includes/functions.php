@@ -1732,10 +1732,10 @@ function get_tag_id_by_text($tag)
  *******************************************/
 function add_tagges($tag_ids=[], $taggee_id, $type='risk')
 {
-    if(!$tag_ids)
-    {
-        return false;
-    }
+//    if(!$tag_ids)
+//    {
+//        return false;
+//    }
     
     $tag_ids_string = implode(",", $tag_ids);
     // Open the database connection
@@ -14845,6 +14845,7 @@ function create_new_tag_from_string($tags_string, $delimiter=",", $type=NULL, $t
 {
     if(!$tags_string)
     {
+        add_tagges([], $taggee_id, $type);
         return "";
     }
     $tags = explode($delimiter, $tags_string);

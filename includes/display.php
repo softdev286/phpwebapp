@@ -4542,6 +4542,12 @@ function display_risk_columns( $id=true, $risk_status=false, $subject=true, $ref
                             </tr>\n";
                             echo "<tr>
                                 <td>
+                                    <input class=\"hidden-checkbox\" type=\"checkbox\" name=\"date_closed\" id=\"checkbox_date_closed\"" . ($date_closed == true ? " checked=\"yes\"" : "") . " />
+                                    <label for=\"checkbox_date_closed\">". $escaper->escapeHtml($lang['DateClosed']) ."</label>
+                                </td>
+                            </tr>\n";
+                            echo "<tr>
+                                <td>
                                 <input class=\"hidden-checkbox\" type=\"checkbox\" name=\"subject\" id=\"checkbox_subject\"" . ($subject == true ? " checked=\"yes\"" : "") . "  />
                                 <label for=\"checkbox_subject\">". $escaper->escapeHtml($lang['Subject']) ."</label>
                             </tr>\n";
@@ -4772,6 +4778,12 @@ function display_risk_columns( $id=true, $risk_status=false, $subject=true, $ref
         <td>
         <input class=\"hidden-checkbox\" type=\"checkbox\" name=\"risk_status\" id=\"checkbox_risk_status\"" . ($risk_status == true ? " checked=\"yes\"" : "") . " />
         <label for=\"checkbox_risk_status\">". $escaper->escapeHtml($lang['Status']) ."</label>
+        </td>
+        </tr>\n";
+        echo "<tr>
+        <td>
+        <input class=\"hidden-checkbox\" type=\"checkbox\" name=\"date_closed\" id=\"checkbox_date_closed\"" . ($date_closed == true ? " checked=\"yes\"" : "") . "  />
+        <label for=\"checkbox_date_closed\">". $escaper->escapeHtml($lang['DateClosed']) ."</label>
         </td>
         </tr>\n";
         echo "<tr>
@@ -5260,13 +5272,7 @@ function get_dynamic_names_by_main_field_name($field_name)
 //            [
 //                'name' => "submission_date",
 //                'text' => $escaper->escapeHtml($lang['SubmissionDate']),
-//            ],
-        'DateClosed' =>
-            [
-                'name' => "date_closed",
-                'text' => $escaper->escapeHtml($lang['DateClosed']),
-            ],
-        
+//            ]
     );
     return isset($data[$field_name]) ? $data[$field_name] : "";
 }

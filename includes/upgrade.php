@@ -3872,6 +3872,10 @@ function upgrade_database()
                 upgrade_from_20190630001($db);
                 upgrade_database();
                 break;                
+            case "20190930-001":
+                upgrade_from_20190930001($db);
+                upgrade_database();
+                break;                
             default:
                 echo "You are currently running the version of the SimpleRisk database that goes along with your application version.<br />\n";
         }

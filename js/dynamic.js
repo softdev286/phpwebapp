@@ -27,6 +27,30 @@ $(document).ready(function(){
                 defaultSortColumnIndex = index;
             }
         })
+        
+        // Create multiselect of table column filter dropdowns
+        var createMultiSelectColumnFilter = function(selfTable, filterContainer){
+            filterContainer || (filterContainer = selfTable.table().container());
+            $('.dynamic-column-filter').multiselect({
+                enableFiltering: true,
+                buttonWidth: '100%',
+                maxHeight: 150,
+                enableCaseInsensitiveFiltering: true,
+                onDropdownShown: function(){
+                    $('.dataTables_scrollFoot', selfTable.table().container()).css('height', '220px')
+                },
+                onDropdownHide: function(){
+                    $('.dataTables_scrollFoot', selfTable.table().container()).css('height', 'auto')
+                    selfTable.columns.adjust()
+                },
+                onChange: function(){
+                    selfTable.columns.adjust()
+                }
+                
+            })
+            selfTable.columns.adjust()
+            
+        }
 
         var riskDataTables = [];
         $(".risk-datatable").each(function(index){
@@ -123,12 +147,14 @@ $(document).ready(function(){
                         dataType: 'json',
                         success: function(data){
                             
+                            
                             self.api().columns().every( function () {
                                 var column = this;
                                 var columnName = $(column.footer()).data('name').toLowerCase();
                                 var options = data[columnName];
                                 if(options === undefined){
                                     $(column.footer()).empty();
+                                    $('<div style="min-width: 150px">&nbsp;</div>').appendTo( $(column.footer()).empty() );
                                 }else{
                                     var select = $('<select class="dynamic-column-filter" multiple></select>').appendTo( $(column.footer()).empty() );
                                     options.forEach( function ( option ) {
@@ -137,19 +163,7 @@ $(document).ready(function(){
                                 }
                             });
 
-                            $('.dynamic-column-filter').multiselect({
-                                enableFiltering: true,
-                                buttonWidth: '100%',
-                                maxHeight: 150,
-                                onDropdownShown: function(){
-                                    $('.dataTables_scrollFoot', self.api().table().container()).css('height', '220px')
-                                },
-                                onDropdownHide: function(){
-                                    $('.dataTables_scrollFoot', self.api().table().container()).css('height', 'auto')
-                                }
-                                
-                            })
-                            self.api().columns.adjust()
+                            createMultiSelectColumnFilter(self.api());
                         },
                         error: function(xhr,status,error){
                             if(!retryCSRF(xhr, this))
@@ -190,6 +204,7 @@ $(document).ready(function(){
                 var column = riskDataTables[key].column("th[data-name='"+ $(this).attr('name') +"']");
                 if($(this).is(':checked')){
                     column.visible(true);
+                    createMultiSelectColumnFilter(riskDataTables[key], column.footer());
                 }else{
                     column.visible(false);
                 }

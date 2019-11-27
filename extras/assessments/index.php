@@ -11686,7 +11686,7 @@ function get_questionnaire_controls_by_token($token)
             LEFT JOIN `questionnaire_responses` t6 ON t1.id=t6.questionnaire_tracking_id 
                                                 AND t2.template_id=t6.template_id 
                                                 AND t3.questionnaire_question_id=t6.question_id
-                                                AND t6.submit_risk=1
+                                                /* AND t6.submit_risk=1 */
         WHERE
             t1.token=:token
         GROUP BY

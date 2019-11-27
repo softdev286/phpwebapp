@@ -1080,9 +1080,6 @@ function dynamicriskUniqueColumnDataAPI()
                         }
                     }
                     
-                    // Set custom values to dynamic risk reporting page
-                    $data[] = $text;
-                    
                     $custom_key = "custom_field_".$active_field['id'];
                     if(isset($uniqueColumns[$custom_key]) && is_array($uniqueColumns[$custom_key]))
                     {
@@ -1095,9 +1092,8 @@ function dynamicriskUniqueColumnDataAPI()
                 }
 
             }
-            
-            $datas[] = $data;
         }
+
         $uniqueColumns = array_map("array_unique", $uniqueColumns);
         foreach($uniqueColumns as $key => &$uniqueColumnArr)
         {
