@@ -4136,7 +4136,7 @@ function view_risks_and_assets_selections($report)
 /******************************************
 * FUNCTION: VIEW GET RISKS BY SELECTIONS *
 ******************************************/
-function view_get_risks_by_selections($status=0, $group=0, $sort=0, $affected_assets_filter=0, $tags_filter=0, $locations_filter="", $id=true, $risk_status=false, $subject=true, $reference_id=false, $regulation=false, $control_number=false, $location=false, $source=false, $category=false, $team=false, $additional_stakeholders=false, $technology=false, $owner=false, $manager=false, $submitted_by=false, $scoring_method=false, $calculated_risk=true, $residual_risk=true, $submission_date=true, $review_date=false, $project=false, $mitigation_planned=true, $management_review=true, $days_open=false, $next_review_date=false, $next_step=false, $affected_assets=false, $planning_strategy=false, $planning_date=false, $mitigation_effort=false, $mitigation_cost=false, $mitigation_owner=false, $mitigation_team=false, $mitigation_accepted=false, $mitigation_date=false, $mitigation_controls=false, $risk_assessment=false, $additional_notes=false, $current_solution=false, $security_recommendations=false, $security_requirements=false, $risk_tags=false, $date_closed=false, $custom_values=[])
+function view_get_risks_by_selections($status=0, $group=0, $sort=0, $affected_assets_filter=0, $tags_filter=0, $locations_filter="", $id=true, $risk_status=false, $subject=true, $reference_id=false, $regulation=false, $control_number=false, $location=false, $source=false, $category=false, $team=false, $additional_stakeholders=false, $technology=false, $owner=false, $manager=false, $submitted_by=false, $scoring_method=false, $calculated_risk=true, $residual_risk=true, $submission_date=true, $review_date=false, $project=false, $mitigation_planned=true, $management_review=true, $days_open=false, $next_review_date=false, $next_step=false, $affected_assets=false, $planning_strategy=false, $planning_date=false, $mitigation_effort=false, $mitigation_cost=false, $mitigation_owner=false, $mitigation_team=false, $mitigation_accepted=false, $mitigation_date=false, $mitigation_controls=false, $risk_assessment=false, $additional_notes=false, $current_solution=false, $security_recommendations=false, $security_requirements=false, $risk_tags=false, $closure_date=false, $custom_values=[])
 {
     global $lang, $escaper;
     
@@ -4284,7 +4284,7 @@ function view_get_risks_by_selections($status=0, $group=0, $sort=0, $affected_as
     echo "</div>\n";
 
     // Risk columns
-    echo display_risk_columns( $id, $risk_status, $subject, $reference_id, $regulation, $control_number, $location, $source, $category, $team, $additional_stakeholders, $technology, $owner, $manager, $submitted_by, $scoring_method, $calculated_risk, $residual_risk, $submission_date, $review_date, $project, $mitigation_planned, $management_review, $days_open, $next_review_date, $next_step, $affected_assets, $planning_strategy, $planning_date, $mitigation_effort, $mitigation_cost, $mitigation_owner, $mitigation_team, $mitigation_accepted, $mitigation_date, $mitigation_controls, $risk_assessment, $additional_notes, $current_solution, $security_recommendations, $security_requirements, $risk_tags, $date_closed, $custom_values);
+    echo display_risk_columns( $id, $risk_status, $subject, $reference_id, $regulation, $control_number, $location, $source, $category, $team, $additional_stakeholders, $technology, $owner, $manager, $submitted_by, $scoring_method, $calculated_risk, $residual_risk, $submission_date, $review_date, $project, $mitigation_planned, $management_review, $days_open, $next_review_date, $next_step, $affected_assets, $planning_strategy, $planning_date, $mitigation_effort, $mitigation_cost, $mitigation_owner, $mitigation_team, $mitigation_accepted, $mitigation_date, $mitigation_controls, $risk_assessment, $additional_notes, $current_solution, $security_recommendations, $security_requirements, $risk_tags, $closure_date, $custom_values);
     
     echo "</form>\n";
 
@@ -4494,7 +4494,7 @@ function display_save_dynamic_risk_selections()
 /*********************************
 * FUNCTION: DISPLAY RISK COLUMNS *
 **********************************/
-function display_risk_columns( $id=true, $risk_status=false, $subject=true, $reference_id=false, $regulation=false, $control_number=false, $location=false, $source=false, $category=false, $team=false, $additional_stakeholders=false, $technology=false, $owner=false, $manager=false, $submitted_by=false, $scoring_method=false, $calculated_risk=true, $residual_risk=true, $submission_date=true, $review_date=false, $project=false, $mitigation_planned=true, $management_review=true, $days_open=false, $next_review_date=false, $next_step=false, $affected_assets=false, $planning_strategy=false, $planning_date=false, $mitigation_effort=false, $mitigation_cost=false, $mitigation_owner=false, $mitigation_team=false, $mitigation_accepted=false, $mitigation_date=false, $mitigation_controls=false, $risk_assessment=false, $additional_notes=false, $current_solution=false, $security_recommendations=false, $security_requirements=false, $risk_tags=false, $date_closed=false, $custom_values=[]){
+function display_risk_columns( $id=true, $risk_status=false, $subject=true, $reference_id=false, $regulation=false, $control_number=false, $location=false, $source=false, $category=false, $team=false, $additional_stakeholders=false, $technology=false, $owner=false, $manager=false, $submitted_by=false, $scoring_method=false, $calculated_risk=true, $residual_risk=true, $submission_date=true, $review_date=false, $project=false, $mitigation_planned=true, $management_review=true, $days_open=false, $next_review_date=false, $next_step=false, $affected_assets=false, $planning_strategy=false, $planning_date=false, $mitigation_effort=false, $mitigation_cost=false, $mitigation_owner=false, $mitigation_team=false, $mitigation_accepted=false, $mitigation_date=false, $mitigation_controls=false, $risk_assessment=false, $additional_notes=false, $current_solution=false, $security_recommendations=false, $security_requirements=false, $risk_tags=false, $closure_date=false, $custom_values=[]){
     global $escaper, $lang;
     echo "<div class=\"row-fluid\">\n";
 
@@ -4542,8 +4542,8 @@ function display_risk_columns( $id=true, $risk_status=false, $subject=true, $ref
                             </tr>\n";
                             echo "<tr>
                                 <td>
-                                    <input class=\"hidden-checkbox\" type=\"checkbox\" name=\"date_closed\" id=\"checkbox_date_closed\"" . ($date_closed == true ? " checked=\"yes\"" : "") . " />
-                                    <label for=\"checkbox_date_closed\">". $escaper->escapeHtml($lang['DateClosed']) ."</label>
+                                    <input class=\"hidden-checkbox\" type=\"checkbox\" name=\"closure_date\" id=\"checkbox_closure_date\"" . ($closure_date == true ? " checked=\"yes\"" : "") . " />
+                                    <label for=\"checkbox_closure_date\">". $escaper->escapeHtml($lang['DateClosed']) ."</label>
                                 </td>
                             </tr>\n";
                             echo "<tr>
@@ -4782,8 +4782,8 @@ function display_risk_columns( $id=true, $risk_status=false, $subject=true, $ref
         </tr>\n";
         echo "<tr>
         <td>
-        <input class=\"hidden-checkbox\" type=\"checkbox\" name=\"date_closed\" id=\"checkbox_date_closed\"" . ($date_closed == true ? " checked=\"yes\"" : "") . "  />
-        <label for=\"checkbox_date_closed\">". $escaper->escapeHtml($lang['DateClosed']) ."</label>
+        <input class=\"hidden-checkbox\" type=\"checkbox\" name=\"closure_date\" id=\"checkbox_closure_date\"" . ($closure_date == true ? " checked=\"yes\"" : "") . "  />
+        <label for=\"checkbox_closure_date\">". $escaper->escapeHtml($lang['DateClosed']) ."</label>
         </td>
         </tr>\n";
         echo "<tr>

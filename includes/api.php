@@ -827,40 +827,6 @@ function dynamicriskForm()
         // Query the risks
         $risks = risks_query($status, $sort, $group, $processed_affected_assets_filter, $tags_filter, $locations_filter, $rowCount, $start, $length, $group_value_from_db, "", [], $orderColumnName, $orderDir, $risks_by_team, $teams, $owners, $ownersmanagers);
 
-//        $orderColumnIndex = $_POST['order'][0]['column'];
-//        $orderDir = $_POST['order'][0]['dir'];
-//        $orderColumnName = $_POST['columns'][$orderColumnIndex]['name'];
-//        $sorted = false;
-//        if($orderColumnName == "calculated_risk" || $orderColumnName == "id"){
-//            $sorted = true;
-            // Reset order for specific columns
-//            usort($risks, function($a, $b) use ($orderDir, $orderColumnName)
-//                {
-//                    switch($orderColumnName){
-//                        case "id":
-//                            $aValue = trim($a['id']);
-//                            $bValue = trim($b['id']);
-//                        break;
-//                        case "calculated_risk":
-//                            $aValue = trim($a['calculated_risk']);
-//                            $bValue = trim($b['calculated_risk']);
-//                        break;
-//                        case "residual_risk":
-//                            $aValue = trim($a['residual_risk']);
-//                            $bValue = trim($b['residual_risk']);
-//                        break;
-//                        default:
-//                            return 0;
-//                    }
-//                    if($orderDir == 'asc'){
-//                        return strcasecmp($aValue, $bValue);
-//                    }else{
-//                        return strcasecmp($bValue, $aValue);
-//                    }
-//                }
-//            );
-//        }
-
         $datas = array();
         foreach($risks as $row){
             $row['id'] = (int)$row['id'] + 1000;
@@ -884,7 +850,7 @@ function dynamicriskForm()
                 $escaper->escapeHtml($row['scoring_method']),
                 "<div class='".$escaper->escapeHtml($row['color'])."'><div class='risk-cell-holder'>" . $escaper->escapeHtml($row['calculated_risk']) . "<span class=\"risk-color\" style=\"background-color:" . $escaper->escapeHtml($row['color']) . "\"></span></div></div>",
                 "<div class='".$escaper->escapeHtml($row['residual_color'])."'><div class='risk-cell-holder'>" . $escaper->escapeHtml($row['residual_risk']) . "<span class=\"risk-color\" style=\"background-color:" . $escaper->escapeHtml($row['residual_color']) . "\"></span></div></div>",
-                $escaper->escapeHtml(date(get_default_datetime_format("H:i"), strtotime($row['submission_date']))),
+                $escaper->escapeHtml(format_datetime($row['submission_date'], "", "H:i")),
                 $escaper->escapeHtml($row['review_date']),
                 $escaper->escapeHtml($row['project']),
                 planned_mitigation($row['id'], $row['mitigation_id']) , // mitigation plan
@@ -908,7 +874,7 @@ function dynamicriskForm()
                 $escaper->escapeHtml($row['mitigation_date']),
                 $escaper->escapeHtml($row['mitigation_control_names']),
                 $escaper->escapeHtml($row['risk_tags']),
-                $escaper->escapeHtml($row['date_closed'])
+                $escaper->escapeHtml(format_datetime($row['closure_date'], "", "H:i"))
             );
 
             // If customization extra is enabled, add custom fields

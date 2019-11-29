@@ -1518,16 +1518,34 @@ function format_date($date, $default = "")
     }
     else return $default;
 }
-function format_datetime($date, $default = "")
+function format_datetime($date, $default = "", $timeformat = "H:i:s")
 {
     // If the date is not 0000-00-00
     if ($date && $date != "0000-00-00")
     {
         // Set it to the proper format
-        return strtotime($date) ? date(get_default_datetime_format(), strtotime($date)) : "";
+        return strtotime($date) ? date(get_default_datetime_format($timeformat), strtotime($date)) : "";
     }
     else return $default;
 }
+
+/******************************************************
+ * FUNCTION: CONVERT EMPTY DATE VALUE TO EMTPY STRING *
+ ******************************************************/
+function trim_date($date, $default = "")
+{
+    // If the date is not 0000-00-00
+    if ($date && stripos($date, "0000-00") === false)
+    {
+        // Set it to the proper format
+        return $date;
+    }
+    else
+    {
+        return $default;
+    }
+}
+
 /****************************************************************************
  * FUNCTION: GET STANDARD DATE FROM STRING FORMATTED BY DEFAULT DATE FORMAT *
  ****************************************************************************/

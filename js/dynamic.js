@@ -19,7 +19,6 @@ $(document).ready(function(){
                 return;
             }
             columnNames.push(name);
-//            if($("form[name='get_risks_by'] input.hidden-checkbox[name='"+ name +"']").length > 0 &&  !$("form[name='get_risks_by'] input.hidden-checkbox[name='"+ name +"']").is(':checked')){
             if(!$("form[name='get_risks_by'] input.hidden-checkbox[name='"+ name +"']").is(':checked')){
                 columnOptions.push(index);
             }
@@ -41,15 +40,15 @@ $(document).ready(function(){
                 },
                 onDropdownHide: function(){
                     $('.dataTables_scrollFoot', selfTable.table().container()).css('height', 'auto')
-                    selfTable.columns.adjust();
+                    selfTable.columns.adjust()
                 },
                 onChange: function(){
-                    selfTable.columns.adjust();
-                    selfTable.draw();
+                    selfTable.columns.adjust()
                 }
                 
             })
-            selfTable.columns.adjust();
+            selfTable.columns.adjust()
+            
         }
 
         var riskDataTables = [];
@@ -147,7 +146,7 @@ $(document).ready(function(){
                         dataType: 'json',
                         success: function(data){
                             
-                            
+                            /*
                             self.api().columns().every( function () {
                                 var column = this;
                                 var columnName = $(column.footer()).data('name').toLowerCase();
@@ -164,6 +163,7 @@ $(document).ready(function(){
                             });
 
                             createMultiSelectColumnFilter(self.api());
+                            */
                         },
                         error: function(xhr,status,error){
                             if(!retryCSRF(xhr, this))
@@ -204,7 +204,7 @@ $(document).ready(function(){
                 var column = riskDataTables[key].column("th[data-name='"+ $(this).attr('name') +"']");
                 if($(this).is(':checked')){
                     column.visible(true);
-                    createMultiSelectColumnFilter(riskDataTables[key], column.footer());
+//                    createMultiSelectColumnFilter(riskDataTables[key], column.footer());
                 }else{
                     column.visible(false);
                 }

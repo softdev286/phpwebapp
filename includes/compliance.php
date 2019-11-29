@@ -2629,10 +2629,9 @@ function get_initiate_tests_by_filter($filter_by_text, $filter_by_status, $filte
             INNER JOIN `framework_controls` t2 on FIND_IN_SET(t1.value, t2.framework_ids) AND t2.deleted=0
             INNER JOIN `framework_control_tests` t3 on t3.framework_control_id=t2.id
         WHERE
-            /* t1.status=1 AND t1.value=:framework_id AND t2.id=:control_id */
             t1.status=1 AND t2.id=:control_id
     ";
-    
+
     $where = [];
     
     if($filter_by_frequency){
