@@ -13,7 +13,7 @@
  ********************************************************************/
 
 // Extra Version
-define('ASSESSMENTS_EXTRA_VERSION', '20190930-001');
+define('ASSESSMENTS_EXTRA_VERSION', '20191130-001');
 
 // Include required functions file
 require_once(realpath(__DIR__ . '/../../includes/functions.php'));
@@ -7641,6 +7641,7 @@ function display_questionnaire_template_add(){
                     enableFiltering: true,
                     enableCaseInsensitiveFiltering: true,
                     buttonWidth: '100%',
+                    maxHeight: 250,
                     filterPlaceholder: '".$escaper->escapeHtml($lang['SearchForQuestion'])."',
                     onDropdownHide: function(){
                         redraw();

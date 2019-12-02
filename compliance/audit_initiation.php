@@ -57,40 +57,22 @@ include_csrf_magic();
 enforce_permission_compliance();
 
 // Check if a framework was updated
-if (isset($_POST['update_framework']))
-{
+if (isset($_POST['update_framework'])) {
+
   $framework_id = (int)$_POST['framework_id'];
   $parent       = (int)$_POST['parent'];
   $name         = $escaper->escapeHtml($_POST['framework_name']);
   $descripiton  = $escaper->escapeHtml($_POST['framework_description']);
 
-  // Check if the framework name is null
-  if (isset($name) && $name == "")
-  {
-    // Display an alert
-    set_alert(true, "bad", "The framework name cannot be empty.");
-  }
-  // Otherwise
-  else
-  {
     // Check if user has a permission to modify framework
-    if(empty($_SESSION['modify_frameworks']))
-    {
-        set_alert(true, "bad", $escaper->escapeHtml($lang['NoModifyFrameworkPermission']));
+    if(has_permission('modify_frameworks')){
+        if (update_framework($framework_id, $name, $descripiton, $parent)) {
+            set_alert(true, "good", $lang['FrameworkUpdated']);
     }
-    // Update framework
-    elseif(update_framework($framework_id, $name, $descripiton, $parent))
-    {
-        // Display an alert
-        set_alert(true, "good", $escaper->escapeHtml($lang['FrameworkUpdated']));
-    }
-    else
-    {
-        // Display an alert
-        set_alert(true, "bad", $escaper->escapeHtml($lang['FrameworkNameExist']));
+    } else {
+        set_alert(true, "bad", $lang['NoModifyFrameworkPermission']);
     }
 
-  }
   refresh();
 }
 

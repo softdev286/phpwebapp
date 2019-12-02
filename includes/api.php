@@ -3514,25 +3514,29 @@ function updateControlResponse()
 /*************************************
  * FUNCTION: UPDATE FRAMEWORK PARENT *
  *************************************/
-function updateFrameworkParentResponse()
-{
-    global $escaper, $lang;
+function updateFrameworkParentResponse() {
 
-    // If user has no permission for modify frameworks
-    if(empty($_SESSION['modify_frameworks']))
-    {
-        $status_message = $escaper->escapeHtml($lang['NoModifyFrameworkPermission']);
-    }
-    // If user has permission for modify frameworks
-    else
-    {
+    global $lang;
+
+    if(has_permission('modify_frameworks')){
+
         $parent  = (int)$_POST['parent'];
         $framework_id = (int)$_POST['framework_id'];
-        update_framework_parent($parent, $framework_id);
-        $status_message = "Updated framework status";
-    }
 
-    json_response(200, $status_message, []);
+        // Check if the user is going to setup a circular reference
+        if ($parent && $framework_id && detect_circular_parent_reference($framework_id, $parent)) {
+            set_alert(true, "bad", $lang['FrameworkCantBeItsOwnParent']); //No you don't! Circular reference detected...
+            json_response(400, get_alert(true), []);
+        } else {
+            update_framework_parent($parent, $framework_id);
+
+            set_alert(true, "good", $lang['FrameworkParentUpdated']);
+            json_response(200, get_alert(true), []);
+        }
+    } else {
+        set_alert(true, "bad", $lang['NoModifyFrameworkPermission']);
+        json_response(400, get_alert(true), []);
+    }
 }
 
 /*******************************************************************
@@ -3794,8 +3798,8 @@ function auditTimelineResponse()
             $active_audits_url = $_SESSION['base_url'].'/compliance/active_audits.php?test_id='.$audit_test['id'];
             $past_audits_url = $_SESSION['base_url'].'/compliance/past_audits.php?test_id='.$audit_test['id'];
             $buttons = '<button class="btn-initiate-audit" id="'.$audit_test['id'].'" style="width:100%;">'.$escaper->escapeHtml($lang['InitiateAudit']).'</button>
-                        <a class="links" href="'.$active_audits_url.'" target="_blank">'.$escaper->escapeHtml($lang['ViewActiveAudits']).'</a>
-                        <a class="links" href="'.$past_audits_url.'" target="_blank">'.$escaper->escapeHtml($lang['ViewPastAudits']).'</a>';
+                        <a class="btn" href="'.$active_audits_url.'" target="_blank">'.$escaper->escapeHtml($lang['ViewActiveAudits']).'</a>
+                        <a class="btn" href="'.$past_audits_url.'" target="_blank">'.$escaper->escapeHtml($lang['ViewPastAudits']).'</a>';
 
             $data[] = [
                 $buttons,

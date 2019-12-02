@@ -12,7 +12,7 @@
  ********************************************************************/
 
 // Extra Version
-define('UPGRADE_EXTRA_VERSION', '20191018-001');
+define('UPGRADE_EXTRA_VERSION', '20191130-001');
 
 // Include required functions file
 require_once(realpath(__DIR__ . '/../../includes/functions.php'));

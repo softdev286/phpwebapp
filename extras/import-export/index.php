@@ -13,7 +13,7 @@
  ********************************************************************/
 
 // Extra Version
-define('IMPORTEXPORT_EXTRA_VERSION', '20190930001');
+define('IMPORTEXPORT_EXTRA_VERSION', '20191130-001');
 
 // Include required functions file
 require_once(realpath(__DIR__ . '/../../includes/functions.php'));

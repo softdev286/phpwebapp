@@ -14,7 +14,7 @@
  ********************************************************************/
 
 // Extra Version
-define('CUSTOMIZATION_EXTRA_VERSION', '20191001-001');
+define('CUSTOMIZATION_EXTRA_VERSION', '20191130-001');
 
 // Include required functions file
 require_once(realpath(__DIR__ . '/../../includes/functions.php'));

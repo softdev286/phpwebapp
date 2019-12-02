@@ -14,7 +14,7 @@
  ********************************************************************/
 
 // Extra Version
-define('SEPARATION_EXTRA_VERSION', '20190930-001');
+define('SEPARATION_EXTRA_VERSION', '20191130-001');
     
 // Include required functions file
 require_once(realpath(__DIR__ . '/../../includes/functions.php'));

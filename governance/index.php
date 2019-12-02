@@ -89,39 +89,23 @@ if (isset($_POST['add_framework']))
 }
 
 // Check if a framework was updated
-if (isset($_POST['update_framework']))
-{
-  $framework_id = (int)$_POST['framework_id'];
-  $parent       = (int)$_POST['parent'];
-  $name         = $_POST['framework_name'];
-  $descripiton  = $_POST['framework_description'];
+if (isset($_POST['update_framework'])) {
 
-  // Check if the framework name is null
-  if (isset($name) && $name == "")
-  {
-    // Display an alert
-    set_alert(true, "bad", "The framework name cannot be empty.");
-  }
-  // Otherwise
-  else
-  {
+    $framework_id = (int)$_POST['framework_id'];
+    $parent       = (int)$_POST['parent'];
+    $name         = $_POST['framework_name'];
+    $descripiton  = $_POST['framework_description'];
+
     // Check if user has a permission to modify framework
-    if(empty($_SESSION['modify_frameworks'])){
-        set_alert(true, "bad", $escaper->escapeHtml($lang['NoModifyFrameworkPermission']));
-    }
-    // Insert a new framework up to 100 chars
-    elseif(update_framework($framework_id, $name, $descripiton, $parent))
-    {
-        // Display an alert
-        set_alert(true, "good", $escaper->escapeHtml($lang['FrameworkUpdated']));
-    }
-    else{
-        // Display an alert
-        set_alert(true, "bad", $escaper->escapeHtml($lang['FrameworkNameExist']));
+    if(has_permission('modify_frameworks')){
+        if (update_framework($framework_id, $name, $descripiton, $parent)) {
+            set_alert(true, "good", $lang['FrameworkUpdated']);
+        }
+    } else {
+        set_alert(true, "bad", $lang['NoModifyFrameworkPermission']);
     }
 
-  }
-  refresh();
+    refresh();
 }
 
 // Delete if a new framework was submitted

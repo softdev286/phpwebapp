@@ -1799,7 +1799,7 @@ function risks_and_assets_table($report)
                     a.value AS asset_value,
                     av.max_value AS max_value,
                     a.location AS asset_location,
-                    a.team AS asset_team,
+                    a.teams AS asset_team,
                     r.status,
                     r.subject,
                     r.submission_date,
@@ -1960,7 +1960,7 @@ function risks_and_assets_table($report)
                     b.name AS asset_name,
                     b.value AS asset_value,
                     b.location AS asset_location,
-                    b.team AS asset_team,
+                    b.teams AS asset_team,
                     c.status,
                     c.subject,
                     d.calculated_risk,
@@ -1982,7 +1982,7 @@ function risks_and_assets_table($report)
                     a.name AS asset_name,
                     a.value AS asset_value,
                     a.location AS asset_location,
-                    a.team AS asset_team,
+                    a.teams AS asset_team,
                     r.status,
                     r.subject,
                     rs.calculated_risk,
@@ -4086,23 +4086,21 @@ function risks_and_control_table($report)
             $ddd = get_control_number($control_name);
 
             if ( $ddd ) {
-
                 foreach ($ddd as $key => $value) {
-                    
-                // Display the table header
-                    $some_control = get_framework_controls( $value );
-
-                    $data[$i] = $some_control[0];
-                    $data[$i]['risk_id'] = $risk_id;
-                    $data[$i]['status'] = $status;
-                    $data[$i]['subject'] = $subject;
-                    $data[$i]['calculated_risk'] = $calculated_risk;
-                    $data[$i]['color'] = $color;
-                    $data[$i]['dayssince'] = $dayssince;
-                    $data[$i]['location'] = $location;
-                    $data[$i]['mitigation_team'] = $mitigation_team;
-                    
-                    $i++;
+                    if($some_control = get_framework_controls( $value )){
+                        // Display the table header
+                        $data[$i] = $some_control[0];
+                        $data[$i]['risk_id'] = $risk_id;
+                        $data[$i]['status'] = $status;
+                        $data[$i]['subject'] = $subject;
+                        $data[$i]['calculated_risk'] = $calculated_risk;
+                        $data[$i]['color'] = $color;
+                        $data[$i]['dayssince'] = $dayssince;
+                        $data[$i]['location'] = $location;
+                        $data[$i]['mitigation_team'] = $mitigation_team;
+                        
+                        $i++;
+                    }
                 }
             }
                     
@@ -4124,7 +4122,6 @@ function risks_and_control_table($report)
         $temp_control_id = 0;
 
         for ($i=0; $i < sizeof($data) ; $i++) {
-
             if ( $i >0 && $data[$i-1]['risk_id'] == $data[$i]['risk_id'] && $data[$i-1]['id'] == $data[$i]['id']) {
                  continue;
              } 

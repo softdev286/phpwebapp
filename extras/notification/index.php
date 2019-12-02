@@ -18,7 +18,7 @@
  ********************************************************************/
 
 // Extra Version
-define('NOTIFICATION_EXTRA_VERSION', '20190930-001');
+define('NOTIFICATION_EXTRA_VERSION', '20191130-001');
 
 // Include Zend Escaper for HTML Output Encoding
 require_once(realpath(__DIR__ . '/../../includes/Component_ZendEscaper/Escaper.php'));

@@ -18,7 +18,7 @@
  ************************************************************************************************************************/
 
 // Extra Version
-define('JIRA_EXTRA_VERSION', '20190630-001');
+define('JIRA_EXTRA_VERSION', '20191130-001');
 
 // Include required functions file
 require_once(realpath(__DIR__ . '/../../includes/functions.php'));
@@ -925,6 +925,14 @@ function jira_validate_issue_key($issue_key, $risk_id = false) {
     return true;
 }
 
+
+/*
+webhook statuses
+409 already exists
+403 no permission
+
+*/
+
 /********************************************************************************************
  * FUNCTION: CREATE OR ROLL WEBHOOK                                                         *
  * Create new webhook when there's none registered in the database.                         *
@@ -1011,40 +1019,6 @@ function createOrRollWebhook() {
 
     set_alert(true, "bad", $lang['JiraWebhookSetupFailed']);
     return false;
-}
-
-/********************************************************************************************
- * FUNCTION: CALL JIRA API                                                                  *
- * Issuing a call to the jira instance using the stored credentials(or the one provided).   *
- * Returning the status and the result in a list.                                           *
- ********************************************************************************************/
-function callJiraAPI($url, $method, $data=false, $JiraAuthToken=false) {
-
-    if ($JiraAuthToken === false)
-        $JiraAuthToken = get_setting('JiraAuthToken');
-
-    $opts = array('http' =>
-        array(
-            'method'  => $method,
-            'header'  => 
-                        "Authorization: Basic $JiraAuthToken\r\n".
-                        "Content-Type: application/json\r\n".
-                        "Accept: application/json\r\n",
-            'ignore_errors' => true
-        )
-    );
-    
-    if ($data !== false) {
-        $opts['http']['content'] = $data;
-        $opts['http']['header'] .= 'Content-Length: ' . strlen($data);
-    }
-
-    $context = stream_context_create($opts);
-    $result = file_get_contents($url, false, $context);
-
-    preg_match('{HTTP\/\S*\s(\d{3})}', $http_response_header[0], $match);
-
-    return [(int)$match[1], $result];
 }
 
 /************************************************************************************
@@ -1703,25 +1677,42 @@ function jira_push_changes($issue_key, $risk_id) {
 
     global $lang, $escaper;
 
-    $risk = get_synchronized_risk_field_values($risk_id);
-
     // Getting the list of pending changes so we can 
     $pending_changes = get_pending_risk_changes($risk_id);
+
+    // If there're no changes pending and the `last_sync` field is not set yet,
+    // then it's a new risk-issue association and the first sync
+    $new = !$pending_changes && !get_risk_issue_association_metadata($risk_id)['last_sync'];
+
+    
+    if ($new && get_setting('JiraFieldSyncDirectionOnConflict') === 'pull') {
+        jira_pull_changes($issue_key, $risk_id);
+        return;
+    }
 
     $JiraSynchronizeStatus = get_setting('JiraSynchronizeStatus');
     $JiraSynchronizeSummary = get_setting('JiraSynchronizeSummary');
     $JiraSynchronizeDescription = get_setting('JiraSynchronizeDescription');
 
+    $risk = get_synchronized_risk_field_values($risk_id);
+
     $issue = ['fields' => []];
     $workflow_transition = ['transition' => []];
 
-    if ($JiraSynchronizeStatus && isset($pending_changes['status'])) {
-//error_log('Synchronize status: push');
-//error_log('pending_changes - status: ' . json_encode($pending_changes['status']));
+    if ($JiraSynchronizeStatus && ($new || isset($pending_changes['status']))) {
+// error_log('Synchronize status: push');
+// error_log('pending_changes - status: ' . json_encode($pending_changes));
 
         $transition_status_id = null;
+        if ($new) {
+            if ($risk['status'] === 'Closed' && get_setting('JiraSynchronizeStatus_IssueClose')) {
+                $transition_status_id = (int)get_setting('JiraSynchronizeStatus_IssueClose_SetStatus');
+            } elseif ($risk['status'] !== 'Closed' && get_setting('JiraSynchronizeStatus_IssueReopen')) {
+                $transition_status_id = (int)get_setting('JiraSynchronizeStatus_IssueReopen_SetStatus');
+            }
+        }
         // Risk Reopened
-        if ($pending_changes['status']['changed_from'] === 'Closed' && get_setting('JiraSynchronizeStatus_IssueReopen')) {
+        elseif ($pending_changes['status']['changed_from'] === 'Closed' && get_setting('JiraSynchronizeStatus_IssueReopen')) {
             $transition_status_id = (int)get_setting('JiraSynchronizeStatus_IssueReopen_SetStatus');
         }
         // Risk Closed
@@ -1812,7 +1803,6 @@ function refresh_risk_last_sync($risk_id, $current_datetime = null) {
 function get_risk_id_by_issue_key($issue_key) {
     $db = db_open();
 
-    // Checking if the risk is already has an issue assigned to it
     $stmt = $db->prepare("
         SELECT
             `risk_id`
@@ -1831,60 +1821,39 @@ function get_risk_id_by_issue_key($issue_key) {
     
     return $risk_id;
 }
-/*
-function jira_push_changes($risk_id) {
-    $JiraInstanceURL = get_setting('JiraInstanceURL');
+
+/********************************************************************************************
+ * FUNCTION: CALL JIRA API                                                                  *
+ * Issuing a call to the jira instance using the stored credentials(or the one provided).   *
+ * Returning the status and the result in a list.                                           *
+ ********************************************************************************************/
+function callJiraAPI($url, $method, $data=false, $JiraAuthToken=false) {
+
+    if ($JiraAuthToken === false)
+        $JiraAuthToken = get_setting('JiraAuthToken');
+
+    $opts = array('http' =>
+        array(
+            'method'  => $method,
+            'header'  => 
+                        "Authorization: Basic $JiraAuthToken\r\n".
+                        "Content-Type: application/json\r\n".
+                        "Accept: application/json\r\n",
+            'ignore_errors' => true
+        )
+    );
     
-    //$url = "{$JiraInstanceURL}rest/api/latest/issue/$issueKey";
-
-
-
-  "fields": {
-    "summary": "This is a shorthand for a set operation on the summary field",
-    "customfield_10010": 1,
-    "customfield_10000": {
-      "type": "doc",
-      "version": 1,
-      "content": [
-        {
-          "type": "paragraph",
-          "content": [
-            {
-              "text": "This is a shorthand for a set operation on a text custom field",
-              "type": "text"
-            }
-          ]
-        }
-      ]
-    }
-  }
-
-
-
-
-    $data = json_encode([
-        'fields' => [
-            'summary' => 'SUMM',
-            'description' => {'DESC'},
-        ]
-    ]);
-
-    list($status, $result) = callJiraAPI($url, 'PUT', $data);
-
-    if ($status === 200 || $status === 302) {
-        return true;
-    } else {
-        return false;
+    if ($data !== false) {
+        $opts['http']['content'] = $data;
+        $opts['http']['header'] .= 'Content-Length: ' . strlen($data);
     }
 
-    return false;
-}*/
+    $context = stream_context_create($opts);
+    $result = file_get_contents($url, false, $context);
 
-/*
-webhook statuses
-409 already exists
-403 no permission
+    preg_match('{HTTP\/\S*\s(\d{3})}', $http_response_header[0], $match);
 
-*/
+    return [(int)$match[1], $result];
+}
 
 ?>

@@ -13,7 +13,7 @@
  ********************************************************************/
 
 // Extra Version
-define('UCF_EXTRA_VERSION', '20191115-001');
+define('UCF_EXTRA_VERSION', '20191130-001');
 
 // UCF Server URL
 define('UCF_SERVER_URL', 'https://api.unifiedcompliance.com/');

@@ -20,12 +20,12 @@ $escaper = new Zend\Escaper\Escaper('utf-8');
  *****************************************/
 function check_permission_governance()
 {
-    // Check if governance is authorized
-    if (!isset($_SESSION["governance"]) || $_SESSION["governance"] != 1)
-    {
-            return false;
-    }
-    else return true;
+        // Check if governance is authorized
+        if (!isset($_SESSION["governance"]) || $_SESSION["governance"] != 1)
+        {
+                return false;
+        }
+        else return true;
 }
 
 /*******************************************
@@ -33,12 +33,12 @@ function check_permission_governance()
  *******************************************/
 function enforce_permission_governance()
 {
-    // If governance is not authorized
-    if (!check_permission_governance())
-    {
-        header("Location: ../index.php");
-        exit(0);
-    }
+        // If governance is not authorized
+        if (!check_permission_governance())
+        {
+                header("Location: ../index.php");
+                exit(0);
+        }
 }
 
 /*********************************************
@@ -46,12 +46,12 @@ function enforce_permission_governance()
  *********************************************/
 function check_permission_riskmanagement()
 {
-    // Check if riskmanagement is authorized
-    if (!isset($_SESSION["riskmanagement"]) || $_SESSION["riskmanagement"] != 1)
-    {
-        return false;
-    }
-    else return true;
+	// Check if riskmanagement is authorized
+	if (!isset($_SESSION["riskmanagement"]) || $_SESSION["riskmanagement"] != 1)
+	{
+		return false;
+	}
+	else return true;
 }
 
 /***********************************************
@@ -60,11 +60,11 @@ function check_permission_riskmanagement()
 function enforce_permission_riskmanagement()
 {
         // If riskmanagement is not authorized
-    if (!check_permission_riskmanagement())
-    {
-        header("Location: ../index.php");
-        exit(0);
-    }
+	if (!check_permission_riskmanagement())
+        {
+                header("Location: ../index.php");
+                exit(0);
+        }
 }
 
 /*****************************************
@@ -72,12 +72,12 @@ function enforce_permission_riskmanagement()
  *****************************************/
 function check_permission_compliance()
 {
-    // Check if compliance is authorized
-    if (!isset($_SESSION["compliance"]) || $_SESSION["compliance"] != 1)
-    {
-        return false;
-    }
-    else return true;
+        // Check if compliance is authorized
+        if (!isset($_SESSION["compliance"]) || $_SESSION["compliance"] != 1)
+        {
+                return false;
+        }
+        else return true;
 }
 
 /*******************************************
@@ -85,12 +85,12 @@ function check_permission_compliance()
  *******************************************/
 function enforce_permission_compliance()
 {
-    // If compliance is not authorized
-    if (!check_permission_compliance())
-    {
-        header("Location: ../index.php");
-        exit(0);
-    }
+        // If compliance is not authorized
+        if (!check_permission_compliance())
+        {
+                header("Location: ../index.php");
+                exit(0);
+        }
 }
 
 /*************************************
@@ -98,12 +98,12 @@ function enforce_permission_compliance()
  *************************************/
 function check_permission_asset()
 {
-    // Check if asset is authorized
-    if (!isset($_SESSION["asset"]) || $_SESSION["asset"] != 1)
-    {
-        return false;
-    }
-    else return true;
+        // Check if asset is authorized
+        if (!isset($_SESSION["asset"]) || $_SESSION["asset"] != 1)
+        {
+                return false;
+        }
+        else return true;
 }
 
 /*******************************************
@@ -111,12 +111,12 @@ function check_permission_asset()
  *******************************************/
 function enforce_permission_asset()
 {
-    // If asset is not authorized
-    if (!check_permission_asset())
-    {
-        header("Location: ../index.php");
-        exit(0);
-    }
+        // If asset is not authorized
+        if (!check_permission_asset())
+        {
+                header("Location: ../index.php");
+                exit(0);
+        }
 }
 
 /******************************************
@@ -193,4 +193,13 @@ function check_questionnaire_get_token() {
     $GLOBALS[$global_var_name] = false;
     return false;
 }
+
+/****************************************
+ * FUNCTION: HAS PERMISSION             *
+ * Checks if the user has $permission.  *
+ ****************************************/
+function has_permission($permission) {
+    return $permission && isset($_SESSION[$permission]) && $_SESSION[$permission] == 1;
+}
+
 ?>

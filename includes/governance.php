@@ -138,6 +138,12 @@ function get_parent_frameworks($frameworks, $framework_id, &$news){
     if($framework_id == 0){
         return;
     }
+    foreach($news as $newRow)
+    {
+        if($framework_id == $newRow['value']){
+            return;
+        }
+    }
     foreach($frameworks as $framework){
         if($framework['value'] == $framework_id){
             array_unshift($news, $framework);
@@ -297,13 +303,16 @@ function get_framework_tabs($status)
                 idField: 'value',
                 treeField: 'name',
                 scrollbarSize: 0,
-                onLoadSuccess: function(row, data){\n";
-                    if(!empty($_SESSION['modify_frameworks']))
-                    {
-                        echo "\$(this).treegrid('enableDnd', row?row.value:null);";
-                    }
-                    
-                    echo "if(data.length){
+                onLoadSuccess: function(row, data){
+    ";
+
+    if(!empty($_SESSION['modify_frameworks'])) {
+        echo "
+                    \$(this).treegrid('enableDnd', row?row.value:null);";
+    }
+
+    echo "
+                    if(data.length){
                         var totalCount = data[0].totalCount;
                     }else{
                         var totalCount = 0;
@@ -342,9 +351,19 @@ function get_framework_tabs($status)
                         url: BASE_URL + '/api/governance/update_framework_parent',
                         type: 'POST',
                         data: {parent : parent, framework_id:framework_id},
+                        success: function(data){
+                            if(data.status_message){
+                                showAlertsFromArray(data.status_message);
+                            }
+                        },
                         error: function(xhr,status,error){
-                            if(!retryCSRF(xhr, this))
-                            {
+                            if(!retryCSRF(xhr, this)) {
+                                if(xhr.responseJSON && xhr.responseJSON.status_message){
+                                    showAlertsFromArray(xhr.responseJSON.status_message);
+                                    setTimeout(function(){
+                                        location.reload();
+                                    }, 1500);
+                                }
                             }
                         }
                     });
@@ -738,28 +757,78 @@ function add_framework($name, $description, $parent=0, $status=1){
     return $framework_id;
 }
 
+
+/********************************************************************************
+ * FUNCTION: DETECT CIRCULAR PARENT REFERENCE                                   *
+ * Detecting whether with the new parent there would be a circular reference.   *
+ * Circular reference in this case means that a going up in the                 *
+ * list of parents we'd eventually find the framework we started from.          *
+ * Returns true if there'd be a circular reference, false otherwise.            *
+ ********************************************************************************/
+function detect_circular_parent_reference($framework_id, $parent) {
+
+    $db = db_open();
+
+    $ancestor = $parent;
+    $result = false;
+
+    // Go through the list of ancestors
+    do {
+        $stmt = $db->prepare("SELECT `parent` FROM `frameworks` WHERE `value` = :ancestor");
+        $stmt->bindParam(":ancestor", $ancestor, PDO::PARAM_INT);
+        $stmt->execute();
+        $ancestor = (int)$stmt->fetchColumn();
+
+        // Exit when we either found ourself among the ancestors
+        if ($ancestor === (int)$framework_id) {
+            $result = true;
+            break;
+        }
+    } while ($ancestor); // or reached the root
+
+    db_close($db);
+
+    return $result;
+}
+
 /******************************
  * FUNCTION: UPDATE FRAMEWORK *
  ******************************/
 function update_framework($framework_id, $name, $description=false, $parent=false){
-    $try_encrypt_name = try_encrypt($name);
+
+    global $lang;
+
+    if (isset($name) && !trim($name)) {
+        set_alert(true, "bad", $lang['FrameworkNameCantBeEmpty']);
+        return false;
+    }
+
+    $encrypted_name = try_encrypt($name);
 
     // Open the database connection
     $db = db_open();
 
-    // Check if the framework exists
-    $stmt = $db->prepare("SELECT * FROM `frameworks` where name=:name and value<>:framework_id");
-    $stmt->bindParam(":name", $try_encrypt_name);
+    // Check if the name is already taken by another framework
+    $stmt = $db->prepare("SELECT 1 FROM `frameworks` WHERE `name` = :name AND `value` <> :framework_id;");
+    $stmt->bindParam(":name", $encrypted_name);
     $stmt->bindParam(":framework_id", $framework_id, PDO::PARAM_INT);
     $stmt->execute();
-    $row = $stmt->fetch();
-    if(isset($row[0])){
+    $result = $stmt->fetchColumn();
+
+    if($result) {
+        set_alert(true, "bad", $lang['FrameworkNameExist']);
+        return false;
+    }
+
+    // Check if the user is going to setup a circular reference
+    if ($parent && detect_circular_parent_reference($framework_id, $parent)) {
+        set_alert(true, "bad", $lang['FrameworkCantBeItsOwnParent']); //No you don't! Circular reference detected...
         return false;
     }
 
     $framework = get_framework($framework_id);
     
-    $framework['name'] = try_encrypt($name);
+    $framework['name'] = $encrypted_name;
     $framework['description'] = $description === false ? try_encrypt($framework['description']) : try_encrypt($description);
     $framework['parent'] = $parent === false ? $framework['parent'] : $parent;
     
@@ -1216,13 +1285,14 @@ function getAvailableControlFrameworkList(){
     
     $all_frameworks = get_frameworks(1);
     $all_parent_frameworks = array();
+
     foreach($frameworks as $framework)
     {
         $parent_frameworks = array();
         get_parent_frameworks($all_frameworks, $framework['value'], $parent_frameworks);
         $all_parent_frameworks = array_merge($all_parent_frameworks, $parent_frameworks);
     }
-    
+
     $results = array();
     $ids = array();
     // Get unique array

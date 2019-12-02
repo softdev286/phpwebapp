@@ -14,7 +14,7 @@
  ********************************************************************/
 
 // Extra Version
-define('ENCRYPTION_EXTRA_VERSION', '20190930-001');
+define('ENCRYPTION_EXTRA_VERSION', '20191130-001');
 
 // Define encryption options
 define('CIPHER', 'MCRYPT_RIJNDAEL_256');
