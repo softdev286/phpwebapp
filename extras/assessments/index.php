@@ -8623,13 +8623,15 @@ function display_questionnaire_add(){
                             echo "</select>
                         </div>
                         <strong class='span2'>". $escaper->escapeHtml($lang['AssessmentContacts']) .":&nbsp; </strong>
-                        <div class='span3'>
-                            <select multiple='multiple' required class='assessment_contacts' style='max-width: none;'>";
-                            foreach($contacts as $contact){
-                                echo "<option value='".$contact['id']."'>".$escaper->escapeHtml($contact['name'])."</option>";
-                            }
-                            echo "</select>
-                        </div>
+                        <div class='span3'>";
+                            // echo "<select multiple='multiple' required class='assessment_contacts' style='max-width: none;'>";
+                            // foreach($contacts as $contact){
+                            //     echo "<option value='".$contact['id']."'>".$escaper->escapeHtml($contact['name'])."</option>";
+                            // }
+                            // echo "</select>";
+                            echo "<select class='assessment_contacts_select' name='assessment_contacts[]' multiple placeholder='" . $escaper->escapeHtml($lang['AffectedAssetsWidgetPlaceholder']) . "'>";
+                            echo "</select>\n";
+                        echo "</div>
                         <div class='span1'></div>
                     </div>";
     }
@@ -8657,13 +8659,15 @@ function display_questionnaire_add(){
                     echo "</select>
                 </div>
                 <strong class='span2'>". $escaper->escapeHtml($lang['AssessmentContacts']) .":&nbsp; </strong>
-                <div class='span3'>
-                    <select multiple='multiple' required class='assessment_contacts' style='max-width: none;'>";
+                <div class='span3'>";
+                    echo "<select multiple='multiple' required class='assessment_contacts' style='max-width: none;'>";
                     foreach($contacts as $contact){
                         echo "<option value='".$contact['id']."'>".$escaper->escapeHtml($contact['name'])."</option>";
                     }
-                    echo "</select>
-                </div>
+                    echo "</select>";
+                    // echo "<select class='assessment_contacts_select' name='assessment_contacts[]' multiple placeholder='" . $escaper->escapeHtml($lang['AffectedAssetsWidgetPlaceholder']) . "'>";
+                    // echo "</select>\n";
+                echo "</div>
                 <div class='span1 text-center'>
                     <a class='delete-row' href=''><img class=\"add-delete-icon\" src=\"../images/minus.png\" width=\"15px\" height=\"15px\"></a>
                 </div>
@@ -8673,6 +8677,63 @@ function display_questionnaire_add(){
     
     echo "
         <script>
+            function assessmentContacts(select_tag, risk_id) {
+                // Giving a default value here because IE can't handle
+                // function parameter default values...
+                risk_id = risk_id || 0;
+                
+                if (!select_tag.length)
+                    return;
+
+                var data = ".json_encode($contacts).";
+                console.log(data);
+
+                var select = select_tag.selectize({
+                    sortField: 'text',
+                    plugins: ['optgroup_columns', 'remove_button', 'restore_on_backspace'],
+                    delimiter: ',',
+                    create: function (input){
+                        return { id:'new_asset_' + input, name:input };
+                    },
+                    persist: false,
+                    valueField: 'id',
+                    labelField: 'name',
+                    searchField: 'name',
+                    sortField: 'name',
+                    // optgroups: [
+                    //     {class: 'asset', name: 'Standard Assets'},
+                    //     {class: 'group', name: 'Asset Groups'}
+                    // ],
+                    optgroupField: 'class',
+                    optgroupLabelField: 'name',
+                    optgroupValueField: 'class',
+                    preload: true,
+                    render: {
+                        item: function(item, escape) {
+                            return '<div class=\"' + item.class + '\">' + escape(item.name) + '</div>';
+                        }
+                    },
+                    load: function(query, callback) {
+                        if (query.length) return callback();
+                        var control = select[0].selectize;
+                        var selected_ids = [];
+                        len = data.length;
+                        for (var i = 0; i < len; i++) {
+                            var item = data[i];
+                            item.id += '_' + item.class;
+                            control.registerOption(item);
+                            if (item.selected == '1') {
+                                selected_ids.push(item.id);
+                            }
+                        }
+                        if (selected_ids.length)
+                            control.setValue(selected_ids);
+                    }
+                });
+            }
+
+            assessmentContacts($('.assessment_contacts_select'));
+
             function refresh_assessment_contacts_widget_names(){
                 $('#add_questionnaire_form select.assessment_contacts').each(function(index, element){
                     $(element).attr('name', 'assessment_contacts[' + index + '][]');
